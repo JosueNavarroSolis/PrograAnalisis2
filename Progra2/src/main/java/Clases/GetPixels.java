@@ -14,10 +14,11 @@ import javax.imageio.ImageIO;
 import java.util.ArrayList;
        
 public class GetPixels {
-   public ArrayList<ArrayList<String>> imagenes;
+   public ArrayList<String> imagenes;
    public ArrayList<String> arbol_modelo;
-   public ArrayList<String> ListaFitness;
-   public int posfit;
+   public float pixeles_arbol_fractal ;
+   public float pixeles_arbol_original;
+   
    public ArrayList<String> arbol(File file) throws IOException{
       BufferedImage img = ImageIO.read(file);
       System.out.println(img);
@@ -38,49 +39,36 @@ public class GetPixels {
       System.out.println("Archivo leido");
       return imagen;
    }
-   public int cuenta(ArrayList<String> arbol){
-       int pixeles_original=0;
-       for(int i =0;i<arbol.size();i++){
-           if (!arbol.get(i).equals("255:255:255")){
-               pixeles_original++;
-           }
-       }
-       return pixeles_original;
-   }
    
-   public int comparador(ArrayList<String> arbol,ArrayList<String> imagenes){
-       int matches = 0;
+   public float comparador(ArrayList<String> arbol,ArrayList<String> imagenes){
+       int matches=0;
+       pixeles_arbol_original=pixeles_arbol_fractal=0;
        for(int i=0;i <arbol.size();i++){
-           if (arbol.get(i).equals(imagenes.get(i)) && !arbol.get(i).equals("255:255:255")){
-               matches++;
+           if (!arbol.get(i).equals("255:255:255")){
+               pixeles_arbol_original++;
+               if(arbol.get(i).equals(imagenes.get(i))){
+                   matches++;
+                   //System.out.println(matches);
+               }
            }
+           if (!imagenes.get(i).equals("255:255:255")){
+               pixeles_arbol_fractal++;
+           }
+           
        }
        return matches;
    }
-
-    /**
-     *
-     * @param arbol
-     * @param arbolesGeneracion
-     * @param listaFitness
-     * @param posfit
-     */
-    public void fitness(ArrayList<String> arbol,ArrayList<ArrayList<String>> arbolesGeneracion,ArrayList<String> listaFitness,int posfit){
-       float matchearbol;
-       float matchefractal;
-       float matches;
-       float total;
-       for(int i = posfit;i < arbolesGeneracion.size();i++){
-        matches= 0;
-        matches = comparador(arbol, arbolesGeneracion.get(i));
-        System.out.println(matches);
-        matchefractal= matches/(cuenta(arbol));
-        System.out.println(matchefractal);
-        matchearbol = matches/cuenta(arbolesGeneracion.get(i));
-        total = matchefractal+matchearbol;
-        System.out.println(total);
-        listaFitness.add(Float.toString(total));
-            //
-       }
+   
+    public float fitness(ArrayList<String> arbol_origen,ArrayList<String> arboleFractal){
+       float matchearbol=0;
+       float matchefractal=0;
+       float matches=0;
+       float total=0;
+       
+       matches=comparador(arbol_origen, arboleFractal);
+       matchefractal= matches/pixeles_arbol_original;
+       matchearbol = matches/pixeles_arbol_fractal;
+       total = matchefractal+matchearbol;
+       return total;
    }       
 }
